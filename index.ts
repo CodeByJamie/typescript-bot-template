@@ -12,8 +12,6 @@ import {
 import path from "node:path";
 import { ClientEvent, type ClientButton, type ClientCommand, type ClientMenu, type ClientModal } from "./src/types/client";
 import { Logger, LogType } from "./src/utils/logger";
-import ValidateEnv from "./src/helpers/core/env.validate";
-import { CoreClient } from "./src/helpers/core/client";
 
 export class ExtendedClient extends Client {
     public commands = new Collection<string, ClientCommand>();
@@ -167,30 +165,29 @@ export class ExtendedClient extends Client {
         }
 
         try {
+            Logger.notification(LogType.CLIENT, "Successfully initialised the client.");
+
             // Load all of the modules
             await this.loadModules();
 
             // Attempt to login to the client
             try {
                 await this.login(Bun.env.CLIENT_TOKEN!);
+                Logger.notification(LogType.CLIENT, "Client has successfully logged in.");
             } catch (error) {
                 Logger.error("Failed to login to the client.", error as Error);
                 process.exit(1);
             }
 
             // Register all the available commands
-            if (process.argv.includes("--cmd")) await this.registerCommands();
-            else Logger.notification(LogType.WARNING, "No new commands have been registered onto the client.");
+            await this.registerCommands();
         } catch (error) {
             Logger.error("Failed to start the client.", error as Error);
             process.exit(1);
         }
 
-        Logger.notification(LogType.INFO, `Startup time: ${Date.now() - startTime}ms`);
+        console.log(`Startup time: ${Date.now() - startTime}ms`);
     }
-};
+}
 
-ValidateEnv();
 new ExtendedClient().start();
-export const myRedis = await new CoreClient().RedisConnect();
-export const database = new CoreClient().DatabaseConnect();

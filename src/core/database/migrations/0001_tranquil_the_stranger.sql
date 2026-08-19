@@ -1,1 +1,0 @@
-ALTER TABLE "tickets" ADD CONSTRAINT "fk_tickets" FOREIGN KEY ("guild_id") REFERENCES "public"."guilds"("id") ON DELETE no action ON UPDATE no action;
